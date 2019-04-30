@@ -1,0 +1,144 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<script type="text/javascript" src="https://code.jquery.com/jquery-git.min.js"></script>
+<style>
+a
+{
+	color:#3CB371;
+}
+a:visited;
+{
+	color:#8FBC8F;
+}
+.spoiler {position:relative;} 
+.spoiler a.spoiler-head {
+	display:block; float:left; margin:10px 0 2px 0; text-decoration:none;
+	} 
+.spoiler a.spoiler-head span {
+	padding:0; border-bottom:dashed 1px #71C83B; font-size:16px; color:#71C83B;
+		} 
+.spoiler .spoiler-body {
+	display:none; position:relative; padding:6px 0 0 0; margin:0; clear:both;} 
+</style>
+</head>
+<body>
+    <div style="margin-left:auto;margin-right: auto; width: 50%; text-align: center;">
+    <form id="filter" method="POST" action="">
+    	 <input type="text" name="book_name" id="title" placeholder="название книги">
+    	 <input type="submit" name="Update" id="search" value="search" />
+    	 <br/>
+    	 <br/>
+    <fieldset>
+    	<div class="spoiler"> <a class="spoiler-head" href="#">	<legend>Жанры</legend></a> 
+    	<div class="spoiler-body">
+    <input type="checkbox" id="fantastic" name="genre" value="fantastic">
+    <label for="fantastic">Fantastic</label>
+    <input type="checkbox" id="classic" name="genre" value="classic">
+    <label for="fantastic">Classic</label>
+	</fieldset>
+	<div class="clear"></div>
+	<fieldset>
+    	<div class="spoiler"> <a class="spoiler-head" href="#">	<legend>Авторы</legend></a> 
+    	<div class="spoiler-body">
+    <input type="checkbox" id="Rowling" name="author" value="Rowling">
+    <label for="fantastic">Rowling</label>
+    <input type="checkbox" id="Astafiev" name="author" value="Astafiev">
+    <label for="fantastic">Astafiev</label>
+	</fieldset>
+	 <div class="clear"></div>
+</form>
+</div>
+<div style="margin-left: auto;margin-right: auto; width: 50%; color:gray; margin-bottom: 20px;" id="results"></div>
+</div>
+<?php
+header('Content-Type: text/html; charset=utf-8');
+
+    $db  =  new  PDO('mysql:dbname=Books; host=localhost',"user","password",
+        array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
+
+
+#header("Content-type: image/jpeg");
+/*
+$book_name = $_POST['book_name'];
+
+if (!isset($_POST['book_name'])) {
+$sql = 'SELECT * FROM `titles_images` WHERE `titles_images`.`titles` IN ('$book_name') ';
+$sth = $db->prepare($sql);
+$sth->execute();
+$res = $sth->fetchAll(PDO::FETCH_ASSOC);
+foreach ($res as $row){
+
+	if($row["image"]) {
+
+    printf (" <center><img src='https://www.litmir.me/%s' max-width='216' max-height='335'></center> <center><h2>-- %s --</h2></center>", $row["image"],$row["title"]);
+}
+    printf ("<p style='text-align:center;'>%s</p> <br/> <br/>",$row["description"]);
+}
+
+}*/
+																															
+$_POST['book_name'] = isset($_POST['book_name']) ? $_POST['book_name'] : '';					
+$response = $_POST['book_name'];
+																																		
+
+
+$sql = "SELECT * FROM `titles_images` WHERE `title` LIKE lower('%".$_POST['book_name']."%') or title LIKE lower('% ".$_POST['book_name']."%') or title LIKE lower('% ".$_POST['book_name']." %')";
+
+$sth = $db->prepare($sql);
+$sth->execute();
+$res = $sth->fetchAll(PDO::FETCH_ASSOC);
+foreach ($res as $row){
+
+	if($row["image"]) {
+
+    printf (" <center><img src='https://www.litmir.me/%s' max-width='216' max-height='335'></center> <center><h2>-- %s --</h2></center>", $row["image"],$row["title"]);
+}
+    printf ("<p style='text-align:center;'>%s</p> <br/> <br/>",$row["description"]);
+}
+
+echo json_encode($response, JSON_UNESCAPED_UNICODE);
+echo '<form action="parser.php" method="post"> <p> Книги взяты с сайта <a href="https://www.litmir.me/bs">https://www.litmir.me/bs</a> </p> <input type="button" id="parser" name="parser" value="Скачать книги"> </input> </form>';
+
+?>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('a.spoiler-head').click(function()
+			{ 
+				$(this).next().toggle(200); return false; });
+	});
+
+	$(document).ready(function() {
+
+	function showValues() {
+    var str = $( "form" ).serialize();
+    var str = decodeURIComponent(str);
+    $( "#results" ).text( str );
+    var str = encodeURIComponent(str);
+  }
+  $( "input[type='checkbox'], input[type='text']" ).on( "click", showValues );
+  $( "select" ).on( "change", showValues );
+  $( "#search" ).focusout(showValues);
+  showValues();
+
+
+document.body.onmouseover = document.body.onmouseout = handler;
+
+function handler(event) {
+	  if (event.type == 'mouseout') {
+    showValues();
+  }
+}
+
+	});
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
