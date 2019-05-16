@@ -9,10 +9,10 @@
 """
 
 
-from .core import *
-from .stars import Stars
-from .videos import Videos
-from .photos import Photos   
+from core import *
+from stars import *
+from videos import *
+from photos import *   
 
 class PornHub(Stars, Videos, Photos):
     def __init__(self, ProxyIP=None, ProxyPort=None, keywords=[], *args):

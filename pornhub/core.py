@@ -1,15 +1,26 @@
 # -*- coding: UTF-8 -*-
 
-from bs4 import BeautifulSoup
-from threading import Thread
-from queue import Queue
-import requests
-import time
 try:
-    from urllib import urlencode
+    from bs4 import BeautifulSoup
+except:
+    import BeatifulSoup
+from threading import Thread
+try:
+    from Queue import *  # For support Python 2
+except:
+    from queue import * # For support Python 3
+
+from requests import *
+from time import *
+try:
+    from urllib2 import urlencode
 except ImportError:
     # For support Python 3
-    from urllib.parse import urlencode
+    try:
+        from urllib.parse import urlparse
+    except ImportError:
+        from urlparse import urlparse
+
 
 BASE_URL	= "https://pornhub.com"
 HEADERS         = { "Content-Type" : "text/html; charset=UTF-8" }
