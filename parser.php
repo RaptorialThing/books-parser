@@ -1,5 +1,5 @@
 <?php
-
+/*test*/
 echo "start parser\n";
 $url = "https://www.litmir.me/bs";
 $ch = curl_init();
