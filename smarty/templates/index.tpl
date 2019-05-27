@@ -1,34 +1,17 @@
-					<html>
+<!DOCTYPE>
+<html>
 <head>
 	<meta charset="utf-8">
 	<script type="text/javascript" src="https://code.jquery.com/jquery-git.min.js"></script>
-<style>
-a
-{
-	color:#3CB371;
-}
-a:visited;
-{
-	color:#8FBC8F;
-}
-.spoiler {position:relative;} 
-.spoiler a.spoiler-head {
-	display:block; float:left; margin:10px 0 2px 0; text-decoration:none;
-	} 
-.spoiler a.spoiler-head span {
-	padding:0; border-bottom:dashed 1px #71C83B; font-size:16px; color:#71C83B;
-		} 
-.spoiler .spoiler-body {
-	display:none; position:relative; padding:6px 0 0 0; margin:0; clear:both;} 
-</style>
+	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
     <div style="margin-left:auto;margin-right: auto; width: 50%; text-align: center;">
-    <form id="filter" method="POST" action="">
+    <form id="filter"  action="">
     	 <input type="text" name="book_name" id="title" placeholder="название книги">
     	 <input type="submit" name="Update" id="search" value="search" />
     	 <br/>
-    	 <br/>
+    	 <br/>	
     <fieldset>
     	<div class="spoiler"> <a class="spoiler-head" href="#">	<legend>Жанры</legend></a> 
     	<div class="spoiler-body">
@@ -47,10 +30,20 @@ a:visited;
     <label for="fantastic">Astafiev</label>
 	</fieldset>
 	 <div class="clear"></div>
+    <fieldset>
+        <div class="spoiler"> <a class="spoiler-head" href="#"> <legend>Litmir.me</legend></a> 
+        <div class="spoiler-body">
+    <label for="scrapper">Включить парсер с litmir.me</label>
+    <input for="scrapper" type="submit" name="scrapper" id="scrapper" value="run" onclick="scrapper.php">
+    </fieldset>
+     <div class="clear"></div>
 </form>
 </div>
-<div style="margin-left: auto;margin-right: auto; width: 50%; color:gray; margin-bottom: 20px;" id="results"></div>
+<div style="margin-left: auto;margin-right: auto; width: 50%; color:gray; margin-bottom: 20px;" id="results">
 </div>
+<div id="books">
+</div>
+{literal}
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('a.spoiler-head').click(function()
@@ -65,15 +58,39 @@ a:visited;
     var str = decodeURIComponent(str);
     $( "#results" ).text( str );
     var str = encodeURIComponent(str);
+    return str;
   }
+
+
   $( "input[type='checkbox'], input[type='text']" ).on( "click", showValues );
   $( "select" ).on( "change", showValues );
   $( "#search" ).focusout(showValues);
   showValues();
 
 
-document.body.onmouseover = document.body.onmouseout = handler;
+function updateBooks(something) {
+    $("#books").html(something);
+}
 
+
+$("#search").click(function (callback){    
+
+
+    var query  = $( "form" ).serialize();
+    $.ajax({type:"post", url:"main.php", data: query,success: function callback(response){
+    updateBooks(response);
+    }, error:function() {
+    res = 'error: search not send to server'   
+    $( "#results" ).text( res );
+    }});   
+    return false;
+
+
+});
+
+
+document.body.onmouseover = document.body.onmouseout = handler;
+    
 function handler(event) {
 	  if (event.type == 'mouseout') {
     showValues();
@@ -84,5 +101,6 @@ function handler(event) {
 
 
 </script>
+{/literal}
 </body>
 </html>

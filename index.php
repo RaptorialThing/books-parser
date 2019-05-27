@@ -1,5 +1,5 @@
 <?php
-// ViewControl is it here
+// ViewControl is  here
 	require_once('classes/classes.php');
 
 
