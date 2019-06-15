@@ -1,150 +1,125 @@
-<?php
+<?php /*
+echo 'Scrapper was started. When new results will inserted to database you will see it 
+<script>f = function() {document.location.href="main.php";}; setTimeout(function() {f();},5000); </script>
+';*/
 class Scrapper
 	{
-		function __construct()
-		{
+
+			/* createDB */
+			function __construct() {
 			$url = "https://www.litmir.me/bs";
-	$ch = curl_init();
-	curl_setopt($ch,CURLOPT_URL,$url);
-	curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
-	$returned = curl_exec($ch);
-	curl_close($ch);
+			$ch = curl_init();
+			curl_setopt($ch,CURLOPT_URL,$url);
+			curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+			$returned = curl_exec($ch);
+			curl_close($ch);
 
-	     
-
-	$db  =  new  PDO('mysql:dbname=sql7290753; host=sql7.freemysqlhosting.net; port=3306',"sql7290753","d1waHgPJm2",
+			$db  =  new  PDO('mysql:dbname=sql7290753; host=localhost;',"ruzal","Hepfkm2016",
 	        array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
 
-	$sql = "
+	  		$sql = "
+					DROP TABLE titles_images_descriptions ;
 
-	DROP TABLE titles_images, authors_genres_descr ;  
+					CREATE database IF NOT EXISTS `sql7290753`;
 
-	";
-	  $sth=$db->prepare($sql);
-	  $sth->execute();
+					use `sql7290753`;
 
+					CREATE TABLE IF NOT EXISTS `titles_images_descriptions` ( `id` int(11) NOT NULL AUTO_INCREMENT,  `title` TEXT  NOT NULL, `image` varchar(255) NOT NULL,  `description` TEXT NOT NULL,  PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+					
+					alter table titles_images_descriptions add fulltext (description);
+					alter table titles_images_descriptions add fulltext (title);
 
+					";
 
-	  $sql = "
+					$sth=$db->prepare($sql);
+	  				$sth->execute();
+			
 
-	CREATE database IF NOT EXISTS `sql7290753`;
+			/* ScrapWriteDB */
 
-	use `sql7290753`;
+					$dom = new DOMDocument();
+					@$dom->loadHTML($returned);
+					$xpath = new DOMXPath($dom);
 
-	CREATE TABLE IF NOT EXISTS `titles_images` ( `id` int(11) NOT NULL AUTO_INCREMENT, `title` varchar(255) NOT NULL, `image` varchar(255),  `description` TEXT NOT NULL,  PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+					$query = './/img[contains(@class,"lt32 lazy")]'; 
+					$query2 = './/div[contains(@class,"item_description")]/div/div/div/div[contains(@class,"BBHtmlCodeInne")]';
 
-	CREATE TABLE IF NOT EXISTS `authors_genres` ( `id` int(11) NOT NULL AUTO_INCREMENT, `authors_genres` TEXT NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ; 
+					$entries = $xpath->query($query);
+					$entries2 = $xpath->query($query2);  
 
-	";
+					$titles_images_descriptions = array();
 
-	  $sth=$db->prepare($sql);
-	  $sth->execute();
+					$book=0;
+					foreach ($entries as $entry) {
+						# img->attributes->NamedMap (item(6) - src)
+						/*$attr = $entry->attributes; 
+						$under_attr = $attr->item(6);
+						
+						$images[] = $under_attr->textContent;
+						$image = $under_attr->textContent;
 
-	$pattern = '/[s]+[r]+[c]+[^\s]+[\.]+[j]+[p]+[g]/';
-	$image_src = preg_match_all($pattern,$returned,$match);
+						$name = $entry->getAttribute('alt');
 
-	$dom = new DOMDocument();
-	@$dom->loadHTML($returned);
-	$xpath = new DOMXPath ($dom);
+						$names[] = $name;
 
-	$query = './/img[@class="lt32 lazy"]|.//div[@class="lt37"]'; 
-	#В одном цикле все обработать или вынести один запрос отдельно и тогда каждый массив
-	#images,names,descriptions будут содержать от 0 до 24 элементов соответственно относящихся к одной #книге. Сейчас записи images и names соответсвенно совпадают, записи descriptions смещены на 1 вперед.
-	$query2 = './/div[contains(@class,"desc_container")]';
+					  	$description = $entry->textContent;
 
-	$entries = $xpath->query($query);
+					  	$descriptions[] = $entry->textContent;
 
-	$entries2 = $xpath->query($query2);  
+				*/		$titles_images_descriptions['book'.$book] = array();
+						$title = $entry->getAttribute('alt');
+						$titles_images_descriptions['book'.$book]['title'] = $title;
+						$src = $entry->getAttribute('data-src');
+						$titles_images_descriptions['book'.$book]['image'] = $src;
+						$book = $book+1;
+					}
 
-	$images = array();
+					function DOMinnerHTML(DOMNode $element) {
+						$innerHTML = "";
+						$children = $element->childNodes;
+						foreach ($children as $child) {
+							$innerHTML .= $element->ownerDocument->saveHTML($child);
+						}
+						return $innerHTML;
+					}
+					$book=0;
+					foreach ($entries2 as $entry2) {
+						$desc = DOMinnerHTML($entry2);
+						$titles_images_descriptions['book'.$book]['description'] = $desc;
+						$book = $book+1;
+					}
+					//var_dump($titles_images_descriptions);
+					
 
-	$names = array();
+						try {
+							foreach ($titles_images_descriptions as $book) {
 
-	$descriptions = array();
+							$db  =  new  PDO('mysql:dbname=sql7290753; host=localhost;',"ruzal","Hepfkm2016",
+							        array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
 
-	$authors_genres = array();
+						    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+							$stmt = $db->prepare("INSERT INTO titles_images_descriptions (title,image,description) VALUES (:title,:image,:description)");
+							$stmt->bindParam(':title',$title);
+							$stmt->bindParam(':image',$image);
+							$stmt->bindParam(':description',$description);
 
-	foreach ($entries as $index=>$entry) {
-		# img->attributes->NamedMap (item(6) - src)
-		$attr = $entry->attributes; 
-		$under_attr = $attr->item(6);
-		
-		$images[] = $under_attr->textContent;
-		$image = $under_attr->textContent;
+							$title = $book['title'];
+							$image = $book['image'];
+							$description = $book['description'];
 
-		$name = $entry->getAttribute('alt');
+							$stmt->execute();
+						}
+							
+						}
 
-		$names[] = $name;
+						catch(PDOException $e) {
+							echo "Error:".$e->getMessage();
+						}
 
-	  $description = $entry->textContent;
+						$db = null;
 
-	  $descriptions[] = $entry->textContent;
-
-
-	  $sql = "
-	INSERT INTO `titles_images` #одним запросом нужно
-	(`id`,`title`,`image`,`description`) 
-	VALUES 
-	(NULL,'".$name."','".$image."','".$description."')
-	";
-	  $sth=$db->prepare($sql);
-	  $sth->bindValue(':title', $titles_images['title']);
-	  $sth->bindValue(':image', $titles_images['image']);
-	  $sth->bindValue(':description', $titles_images['description']);
-	  $sth->execute();
-
-
+					}
 	}
 
-	foreach ($entries2 as $entry) {
-		$authors_genres[] = $entry->textContent;
-
-	  $sql = "
-	INSERT INTO `authors_genres` #одним запросом нужно
-	(`id`,`authors_genres`) 
-	VALUES 
-	(NULL,'".$authors_genres."')
-	";
-	  $sth=$db->prepare($sql);
-	  $sth->bindValue(':authors_genres', $authors_genres['authors_genres']);
-	  $sth->execute();
-
-	}
-
-	var_dump($images,$names,$descriptions,$authors_genres);
-
-	$sql = 'SELECT * FROM `titles_images`';
-	$sth = $db->prepare($sql);
-	$sth->execute();
-	$result = $sth->fetchAll(PDO::FETCH_ASSOC);
-	foreach ($result as $row){
-	    echo $row['title'] . ' | ' . $row['image'] . ' | ' . $row['description'] . "\n";
-	}
-	 
-	/*
-	MariaDB [Books]> explain titles_images;
-	+-------+--------------+------+-----+---------+----------------+
-	| Field | Type         | Null | Key | Default | Extra          |
-	+-------+--------------+------+-----+---------+----------------+
-	| id    | int(11)      | NO   | PRI | NULL    | auto_increment |
-	| title | varchar(255) | NO   |     | NULL    |                |
-	| image | varchar(255) | YES  |     | NULL    |                |
-	+-------+--------------+------+-----+---------+----------------+
-	3 rows in set (0.00 sec)
-
-	MariaDB [Books]> explain authors_genres_descr;
-	+----------------+---------+------+-----+---------+----------------+
-	| Field          | Type    | Null | Key | Default | Extra          |
-	+----------------+---------+------+-----+---------+----------------+
-	| id             | int(11) | NO   | PRI | NULL    | auto_increment |
-	| authors_genres | text    | NO   |     | NULL    |                |
-	| description    | text    | NO   |     | NULL    |                |
-	+----------------+---------+------+-----+---------+----------------+
-	3 rows in set (0.00 sec)
-
-
-	*/
-
-		}
-	}
+	$parser = new Scrapper();
 ?>

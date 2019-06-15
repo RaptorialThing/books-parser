@@ -1,18 +1,18 @@
 <?php
-/* Smarty version 3.1.33, created on 2019-05-27 02:02:16
+/* Smarty version 3.1.33, created on 2019-06-15 19:43:43
   from '/var/www/books.site/books/smarty/templates/index.tpl' */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   'version' => '3.1.33',
-  'unifunc' => 'content_5ceb1af85cc770_10410467',
+  'unifunc' => 'content_5d05203faf27a3_34761065',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
     'c3e3f87f8e4af6a7bdacf1a05bc1fa3b1ccb3ce0' => 
     array (
       0 => '/var/www/books.site/books/smarty/templates/index.tpl',
-      1 => 1558911734,
+      1 => 1560617021,
       2 => 'file',
     ),
   ),
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_5ceb1af85cc770_10410467 (Smarty_Internal_Template $_smarty_tpl) {
+function content_5d05203faf27a3_34761065 (Smarty_Internal_Template $_smarty_tpl) {
 ?><!DOCTYPE>
 <html>
 <head>
@@ -37,7 +37,7 @@ function content_5ceb1af85cc770_10410467 (Smarty_Internal_Template $_smarty_tpl)
     	 <input type="submit" name="Update" id="search" value="search" />
     	 <br/>
     	 <br/>	
-    <fieldset>
+   <!-- <fieldset>
     	<div class="spoiler"> <a class="spoiler-head" href="#">	<legend>Жанры</legend></a> 
     	<div class="spoiler-body">
     <input type="checkbox" id="fantastic" name="genre" value="fantastic">
@@ -55,11 +55,12 @@ function content_5ceb1af85cc770_10410467 (Smarty_Internal_Template $_smarty_tpl)
     <label for="fantastic">Astafiev</label>
 	</fieldset>
 	 <div class="clear"></div>
+     -->
     <fieldset>
         <div class="spoiler"> <a class="spoiler-head" href="#"> <legend>Litmir.me</legend></a> 
         <div class="spoiler-body">
     <label for="scrapper">Включить парсер с litmir.me</label>
-    <input for="scrapper" type="submit" name="scrapper" id="scrapper" value="run" onclick="scrapper.php">
+    <input for="scrapper" type="button" name="scrapper" id="scrapper" value="run">
     </fieldset>
      <div class="clear"></div>
 </form>
@@ -103,7 +104,7 @@ $("#search").click(function (callback){
 
 
     var query  = $( "form" ).serialize();
-    $.ajax({type:"post", url:"main.php", data: query,success: function callback(response){
+    $.ajax({type:"post", url:"index.php", data: query,success: function callback(response){
     updateBooks(response);
     }, error:function() {
     res = 'error: search not send to server'   
@@ -112,6 +113,10 @@ $("#search").click(function (callback){
     return false;
 
 
+});
+
+$('#scrapper').click(function(){
+   document.location.href = 'scrapper.php';
 });
 
 

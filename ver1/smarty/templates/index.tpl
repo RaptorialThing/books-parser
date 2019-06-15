@@ -12,7 +12,7 @@
     	 <input type="submit" name="Update" id="search" value="search" />
     	 <br/>
     	 <br/>	
-   <!-- <fieldset>
+    <fieldset>
     	<div class="spoiler"> <a class="spoiler-head" href="#">	<legend>Жанры</legend></a> 
     	<div class="spoiler-body">
     <input type="checkbox" id="fantastic" name="genre" value="fantastic">
@@ -30,12 +30,11 @@
     <label for="fantastic">Astafiev</label>
 	</fieldset>
 	 <div class="clear"></div>
-     -->
     <fieldset>
         <div class="spoiler"> <a class="spoiler-head" href="#"> <legend>Litmir.me</legend></a> 
         <div class="spoiler-body">
     <label for="scrapper">Включить парсер с litmir.me</label>
-    <input for="scrapper" type="button" name="scrapper" id="scrapper" value="run">
+    <input for="scrapper" type="submit" name="scrapper" id="scrapper" value="run" onclick="scrapper.php">
     </fieldset>
      <div class="clear"></div>
 </form>
@@ -78,7 +77,7 @@ $("#search").click(function (callback){
 
 
     var query  = $( "form" ).serialize();
-    $.ajax({type:"post", url:"index.php", data: query,success: function callback(response){
+    $.ajax({type:"post", url:"main.php", data: query,success: function callback(response){
     updateBooks(response);
     }, error:function() {
     res = 'error: search not send to server'   
@@ -87,10 +86,6 @@ $("#search").click(function (callback){
     return false;
 
 
-});
-
-$('#scrapper').click(function(){
-   document.location.href = 'scrapper.php';
 });
 
 
