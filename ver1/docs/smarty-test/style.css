@@ -1,0 +1,17 @@
+a
+{
+	color:#206b70;
+}
+a:visited;
+{
+	color:#8FBC8F;
+}
+.spoiler {position:relative;} 
+.spoiler a.spoiler-head {
+	display:block; float:left; margin:10px 0 2px 0; text-decoration:none;
+	} 
+.spoiler a.spoiler-head span {
+	padding:0; border-bottom:dashed 1px #71C83B; font-size:16px; color:#71C83B;
+		} 
+.spoiler .spoiler-body {
+	display:none; position:relative; padding:6px 0 0 0; margin:0; clear:both;} 
